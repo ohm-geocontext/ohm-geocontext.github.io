@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoContext — publish a map of any public dataset</title>
+<meta name="description" content="GeoContext is a free, declarative way to publish a map of any public dataset. Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account. Apache-2.0, by OpenHistoryMap.">
+<link rel="canonical" href="https://geocontext.info/">
+<meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GeoContext">
+<meta property="og:title" content="GeoContext — publish a map of any public dataset">
+<meta property="og:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account.">
+<meta property="og:url" content="https://geocontext.info/">
+<meta property="og:image" content="https://geocontext.info/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GeoContext — publish a map of any public dataset">
+<meta name="twitter:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account.">
+<meta name="twitter:image" content="https://geocontext.info/assets/og.png">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/logo.png">
+
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --paper:#f5f0e8; --panel:#fbf8f2; --raise:#efe8da;
+    --ink:#1b1a17; --muted:#6b6459; --faint:#8b8475;
+    --line:#ddd5c7; --line-strong:#cabfa9;
+    --accent:#17795e; --accent-ink:#0f5e49; --accent-2:#5bbf6a;
+    --d-purple:#9448b7; --d-green:#6cba6a; --d-red:#ea583e; --d-pink:#e87ea0;
+    --shadow:0 1px 0 var(--line);
+    --maxw:1120px;
+    --serif:'Switzer',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#14130f; --panel:#1c1a15; --raise:#252219;
+      --ink:#ece6da; --muted:#9a9384; --faint:#7d7768;
+      --line:#322e26; --line-strong:#443f34;
+      --accent:#3fae84; --accent-ink:#5cc79c; --accent-2:#6fcf78;
+      --d-green:#8cdf8a; --d-pink:#febccd;
+    }
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--serif); font-weight:400;
+    font-size:clamp(16px,1.05vw,18px); line-height:1.6;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--accent); color:var(--paper)}
+
+  a{color:inherit; text-decoration:none}
+  .container{max-width:var(--maxw); margin-inline:auto; padding-inline:clamp(20px,5vw,48px)}
+
+  .mono{font-family:var(--mono)}
+  .eyebrow{
+    font-family:var(--mono); font-size:.72rem; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--accent-ink);
+  }
+
+  /* skip link */
+  .skip{position:absolute;left:-999px;top:0;z-index:100;background:var(--ink);color:var(--paper);padding:.6em 1em}
+  .skip:focus{left:12px;top:12px}
+
+  /* ---- top bar ---- */
+  header.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 88%,transparent);
+    backdrop-filter:saturate(1.1) blur(8px);border-bottom:1px solid var(--line)}
+  .bar .row{display:flex;align-items:center;gap:1.5rem;height:64px}
+  .brand{display:flex;align-items:center;gap:.6rem;font-weight:700;letter-spacing:-.01em;font-size:1.06rem}
+  .brand img{width:30px;height:30px;display:block}
+  nav.top{margin-left:auto;display:flex;gap:1.6rem;align-items:center}
+  nav.top a{font-size:.92rem;color:var(--muted);padding:.3em 0;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
+  nav.top a:hover{color:var(--ink);border-color:var(--accent)}
+  nav.top a.ext::after{content:"↗";font-family:var(--mono);font-size:.78em;opacity:.6;margin-left:.25em}
+  @media (max-width:780px){ nav.top a:not(.cta){display:none} }
+  .cta{font-family:var(--serif);font-weight:600;font-size:.9rem;color:var(--paper)!important;background:var(--accent);
+    padding:.55em 1em;border-radius:999px;border:1px solid transparent}
+  .cta:hover{background:var(--accent-ink);border-color:transparent!important}
+
+  /* ---- hero ---- */
+  .hero{padding:clamp(56px,9vw,108px) 0 clamp(40px,6vw,72px);position:relative;overflow:hidden}
+  .hero .grid{display:grid;grid-template-columns:1.35fr .9fr;gap:clamp(28px,5vw,64px);align-items:center}
+  @media (max-width:860px){ .hero .grid{grid-template-columns:1fr} }
+  h1{font-size:clamp(2.5rem,6.2vw,4.4rem);line-height:1.02;letter-spacing:-.03em;font-weight:700;margin:.5rem 0 .2rem}
+  h1 em{font-style:normal;color:var(--accent-ink)}
+  .lead{font-size:clamp(1.08rem,1.8vw,1.34rem);color:var(--muted);max-width:34ch;margin:1.1rem 0 0;line-height:1.5}
+  .stamps{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.8rem 0 0}
+  .stamp{font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;color:var(--ink);
+    border:1px solid var(--line-strong);border-radius:999px;padding:.42em .9em;background:var(--panel)}
+  .stamp b{color:var(--accent-ink);font-weight:600}
+  .actions{display:flex;flex-wrap:wrap;gap:.8rem;margin:2rem 0 0}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.98rem;
+    padding:.72em 1.25em;border-radius:10px;border:1px solid var(--accent);transition:transform .12s,background .15s,box-shadow .15s}
+  .btn.primary{background:var(--accent);color:var(--paper)}
+  .btn.primary:hover{background:var(--accent-ink)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+  .btn.ghost:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .btn:active{transform:translateY(1px)}
+  @media (prefers-reduced-motion: reduce){ .btn:active{transform:none} }
+
+  /* hero mark */
+  .hero-mark{position:relative;justify-self:center}
+  .hero-mark img{width:min(320px,72vw);height:auto;display:block;filter:drop-shadow(0 10px 30px rgba(20,40,30,.12))}
+  @media (max-width:860px){ .hero-mark{display:none} }
+
+  /* ---- generic section ---- */
+  section{padding:clamp(48px,7vw,90px) 0;border-top:1px solid var(--line)}
+  .sec-head{max-width:62ch;margin-bottom:clamp(28px,4vw,48px)}
+  .sec-head h2{font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.08;letter-spacing:-.02em;font-weight:700;margin:.5rem 0 .4rem}
+  .sec-head p{color:var(--muted);font-size:1.08rem;margin:0;max-width:54ch}
+
+  /* ---- how it works ---- */
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  @media (max-width:780px){ .flow{grid-template-columns:1fr} }
+  .step{background:var(--panel);padding:clamp(20px,3vw,30px)}
+  .step .n{font-family:var(--mono);font-size:.78rem;color:var(--accent-ink);font-weight:600;letter-spacing:.08em}
+  .step h3{font-size:1.18rem;margin:.5rem 0 .35rem;letter-spacing:-.01em}
+  .step p{margin:0;color:var(--muted);font-size:.96rem}
+  .step code{font-family:var(--mono);font-size:.86em;background:var(--raise);padding:.1em .4em;border-radius:5px;color:var(--ink)}
+
+  .codewrap{margin-top:clamp(28px,4vw,42px);display:grid;grid-template-columns:1.25fr .9fr;gap:1.5rem;align-items:stretch}
+  @media (max-width:860px){ .codewrap{grid-template-columns:1fr} }
+  .plate{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .plate .cap{display:flex;align-items:center;gap:.5rem;padding:.7em 1em;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:.78rem;color:var(--faint);letter-spacing:.03em}
+  .plate .cap .dot{width:9px;height:9px;border-radius:50%}
+  pre{margin:0;padding:clamp(16px,2.4vw,22px);overflow:auto;font-family:var(--mono);font-size:.84rem;line-height:1.7;color:var(--ink)}
+  pre .k{color:var(--accent-ink)} pre .s{color:#9a6b2f} pre .n{color:var(--d-purple)} pre .c{color:var(--faint)}
+  @media (prefers-color-scheme:dark){ pre .s{color:#d9a45f} }
+  .urlcard{display:flex;flex-direction:column;justify-content:center;gap:1rem;padding:clamp(20px,3vw,30px)}
+  .urlcard .label{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .urlcard .u{font-family:var(--mono);font-size:.92rem;word-break:break-all;line-height:1.6}
+  .urlcard .u .var{color:var(--accent-ink);font-weight:600}
+  .urlcard .arrow{color:var(--faint);font-family:var(--mono)}
+
+  /* ---- toolkit ---- */
+  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+  @media (max-width:880px){ .tools{grid-template-columns:1fr} }
+  .tool{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:clamp(22px,3vw,30px);transition:border-color .18s,transform .18s,box-shadow .18s}
+  .tool:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 28px rgba(20,40,30,.08)}
+  @media (prefers-reduced-motion: reduce){ .tool:hover{transform:none} }
+  .tool .kind{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+  .tool h3{font-size:1.3rem;margin:.55rem 0 .15rem;letter-spacing:-.01em}
+  .tool .repo{font-family:var(--mono);font-size:.8rem;color:var(--faint)}
+  .tool p{color:var(--muted);font-size:.96rem;margin:.9rem 0 1.2rem;flex:1}
+  .tool .go{font-weight:600;color:var(--accent-ink);font-size:.92rem}
+  .tool:hover .go{text-decoration:underline}
+  .tool .go::after{content:" →";font-family:var(--mono)}
+  .byhand{margin-top:1.25rem;font-size:.96rem;color:var(--muted);text-align:center}
+  .byhand code{font-family:var(--mono);font-size:.86em;background:var(--raise);padding:.12em .45em;border-radius:5px;color:var(--ink)}
+
+  /* ---- renders / features ---- */
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  @media (max-width:860px){ .feat{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .feat{grid-template-columns:1fr} }
+  .cell{background:var(--panel);padding:clamp(18px,2.6vw,26px)}
+  .cell h3{font-size:1.05rem;margin:0 0 .4rem;letter-spacing:-.01em;display:flex;align-items:center;gap:.5rem}
+  .cell h3 .d{width:9px;height:9px;border-radius:2px;flex:none}
+  .cell p{margin:0;color:var(--muted);font-size:.92rem}
+  .cell code{font-family:var(--mono);font-size:.82em;color:var(--accent-ink)}
+
+  /* ---- open / cite ---- */
+  .cite{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);align-items:start}
+  @media (max-width:820px){ .cite{grid-template-columns:1fr} }
+  .quote{border-left:2px solid var(--accent);padding:.2em 0 .2em 1.2em;font-size:1.02rem;line-height:1.55}
+  .quote cite{font-style:normal;color:var(--muted)}
+  .quote a{color:var(--accent-ink);border-bottom:1px solid var(--line-strong)}
+  .quote a:hover{border-color:var(--accent)}
+  .meta-list{list-style:none;margin:0;padding:0;display:grid;gap:1.1rem}
+  .meta-list li{display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:start}
+  .meta-list .ico{font-family:var(--mono);color:var(--accent-ink);font-weight:600;font-size:.9rem;padding-top:.15rem}
+  .meta-list b{font-weight:600}
+  .meta-list span{color:var(--muted);font-size:.95rem}
+  .meta-list a{color:var(--accent-ink);border-bottom:1px solid var(--line-strong)}
+  .meta-list a:hover{border-color:var(--accent)}
+
+  /* ---- footer ---- */
+  footer{border-top:1px solid var(--line);padding:clamp(40px,6vw,72px) 0 clamp(28px,4vw,44px);background:var(--panel)}
+  .foot-grid{display:flex;flex-wrap:wrap;gap:2.5rem 4rem;justify-content:space-between}
+  .foot-brand{max-width:30ch}
+  .foot-brand .brand{margin-bottom:.7rem}
+  .foot-brand p{color:var(--muted);font-size:.92rem;margin:0}
+  .foot-col h4{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 .9rem;font-weight:500}
+  .foot-col ul{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+  .foot-col a{color:var(--muted);font-size:.93rem}
+  .foot-col a:hover{color:var(--ink)}
+  .foot-bottom{margin-top:clamp(32px,5vw,52px);padding-top:1.4rem;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;align-items:center;justify-content:space-between;
+    font-family:var(--mono);font-size:.78rem;color:var(--faint)}
+  .foot-bottom a{color:var(--faint)}
+  .foot-bottom a:hover{color:var(--ink)}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <div class="container row">
+    <a class="brand" href="/" aria-label="GeoContext home">
+      <img src="/assets/logo.png" alt="" width="30" height="30">
+      GeoContext
+    </a>
+    <nav class="top" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#toolkit">Toolkit</a>
+      <a href="#renders">What it renders</a>
+      <a href="#open">Open &amp; cited</a>
+      <a class="cta" href="https://github.com/ohm-geocontext">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" style="border-top:none">
+    <div class="container grid">
+      <div>
+        <span class="eyebrow">By OpenHistoryMap · Apache-2.0</span>
+        <h1>Publish a map of <em>any public dataset.</em></h1>
+        <p class="lead">GeoContext turns a small JSON file in a public GitHub repo into an interactive, shareable map.</p>
+        <div class="stamps" role="list" aria-label="What you don't need">
+          <span class="stamp" role="listitem"><b>No</b> fork</span>
+          <span class="stamp" role="listitem"><b>No</b> build</span>
+          <span class="stamp" role="listitem"><b>No</b> account</span>
+          <span class="stamp" role="listitem"><b>No</b> server of your own</span>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="https://www.openhistorymap.org/geocontext-front/Archeolucia/theatres/map">See a live map</a>
+          <a class="btn ghost" href="https://github.com/ohm-geocontext/geocontext-front/blob/HEAD/FORMAT.md">Read the spec</a>
+        </div>
+      </div>
+      <div class="hero-mark" aria-hidden="true">
+        <img src="/assets/logo.png" alt="" width="320" height="320">
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow">The idea</span>
+        <h2>A map is just a file in a repo.</h2>
+        <p>Describe the map you want — basemap, data, layers — in one declarative file. GeoContext fetches it from your repo over a CDN and renders it. The repo stays the source of truth; the map updates when you push.</p>
+      </div>
+
+      <div class="flow">
+        <div class="step">
+          <span class="n">01</span>
+          <h3>Drop a file</h3>
+          <p>Commit a <code>geocontext.json</code> at the root of any public GitHub repo.</p>
+        </div>
+        <div class="step">
+          <span class="n">02</span>
+          <h3>Add your data</h3>
+          <p>Put GeoJSON or CSV next to it. Reference it with a bare relative path.</p>
+        </div>
+        <div class="step">
+          <span class="n">03</span>
+          <h3>Open the map</h3>
+          <p>Visit <code>/&lt;user&gt;/&lt;repo&gt;/map</code>. Share the link — that's it.</p>
+        </div>
+      </div>
+
+      <div class="codewrap">
+        <div class="plate">
+          <div class="cap"><span class="dot" style="background:var(--d-red)"></span><span class="dot" style="background:#e9b84e"></span><span class="dot" style="background:var(--d-green)"></span>&nbsp;geocontext.json</div>
+<pre><span class="c">// at the root of your public repo</span>
+{
+  <span class="k">"title"</span>: <span class="s">"My map"</span>,
+  <span class="k">"center"</span>: [<span class="n">44.292</span>, <span class="n">13.975</span>],
+  <span class="k">"startzoom"</span>: <span class="n">5</span>,
+  <span class="k">"background"</span>: <span class="s">"osm"</span>,
+  <span class="k">"datasources"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"places"</span>,
+      <span class="k">"type"</span>: <span class="s">"geojson+http+remote"</span>,
+      <span class="k">"conf"</span>: { <span class="k">"source"</span>: <span class="s">"data/places.geojson"</span> } }
+  ],
+  <span class="k">"layers"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"Places"</span>, <span class="k">"type"</span>: <span class="s">"features"</span>,
+      <span class="k">"datasource"</span>: <span class="s">"places"</span>,
+      <span class="k">"style"</span>: { <span class="k">"options"</span>: { <span class="k">"radius"</span>: <span class="n">4</span>,
+        <span class="k">"fillColor"</span>: <span class="s">"#9448b7"</span> } } }
+  ]
+}</pre>
+        </div>
+        <div class="plate urlcard">
+          <div>
+            <div class="label">Then open</div>
+            <div class="u">…/<span class="var">&lt;user&gt;</span>/<span class="var">&lt;repo&gt;</span>/map</div>
+          </div>
+          <div class="arrow">↓</div>
+          <div>
+            <div class="label">And you get</div>
+            <p style="margin:.4rem 0 0;color:var(--muted);font-size:.95rem">A full interactive map — pan, zoom, click a feature, read its detail. Push to the repo and the map follows as the CDN cache rolls over.</p>
+          </div>
+          <div style="margin-top:.4rem">
+            <a class="btn ghost" style="font-size:.9rem;padding:.6em 1em" href="https://www.openhistorymap.org/geocontext-front/">Browse live examples</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLKIT -->
+  <section id="toolkit">
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow">One engine, three on-ramps</span>
+        <h2>Write it, draw it, or export it.</h2>
+        <p>The format is plain JSON, so you can author it however suits you — by hand, from a desktop editor with a live preview, or straight out of QGIS. One engine renders them all.</p>
+      </div>
+
+      <div class="tools">
+        <a class="tool" href="https://github.com/ohm-geocontext/geocontext-front">
+          <span class="kind">The engine · web</span>
+          <h3>GeoContext Front</h3>
+          <span class="repo">ohm-geocontext/geocontext-front</span>
+          <p>The Angular + MapLibre/Leaflet renderer that reads any repo and draws the map at <code>/&lt;user&gt;/&lt;repo&gt;/map</code>. Plugin-driven: every basemap and data format is a small library you can extend.</p>
+          <span class="go">View the engine</span>
+        </a>
+        <a class="tool" href="https://github.com/ohm-geocontext/geocontext-app">
+          <span class="kind">Author · desktop</span>
+          <h3>GeoContext Editor</h3>
+          <span class="repo">ohm-geocontext/geocontext-app</span>
+          <p>A Tauri + SvelteKit desktop app to author and update GeoContext repos with forms, asset analysis, import from Shapefile/GeoJSON, a live MapLibre preview, and one-click GitHub publish.</p>
+          <span class="go">Get the editor</span>
+        </a>
+        <a class="tool" href="https://github.com/ohm-geocontext/geocontext-qgis">
+          <span class="kind">Author · QGIS plugin</span>
+          <h3>GeoContext Sync</h3>
+          <span class="repo">ohm-geocontext/geocontext-qgis</span>
+          <p>Export the active QGIS map canvas as <code>geocontext.json</code> plus <code>datasets/*.geojson</code> — basemaps and DEM detected automatically. Save to a folder, or commit and push to a repo.</p>
+          <span class="go">Install the plugin</span>
+        </a>
+      </div>
+      <p class="byhand">…or skip the tools entirely — a <code>geocontext.json</code> is small enough to write by hand in any text editor.</p>
+    </div>
+  </section>
+
+  <!-- WHAT IT RENDERS -->
+  <section id="renders">
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow">Capabilities</span>
+        <h2>More than dots on a map.</h2>
+        <p>GeoContext composes basemaps, vector and tabular data, terrain, and even live streams — declaratively, with two rendering flavours under one format.</p>
+      </div>
+
+      <div class="feat">
+        <div class="cell">
+          <h3><span class="d" style="background:var(--d-green)"></span>Your data</h3>
+          <p>GeoJSON and CSV, inline or fetched. Tag CSV columns with <code>gcx:lat</code> / <code>gcx:lon</code> and rows become points.</p>
+        </div>
+        <div class="cell">
+          <h3><span class="d" style="background:var(--d-purple)"></span>Basemaps</h3>
+          <p>OSM, CARTO, OpenFantasyMaps, raw XYZ, plus server-rendered <code>wms-tiled</code> and <code>arcgis-image</code> services.</p>
+        </div>
+        <div class="cell">
+          <h3><span class="d" style="background:var(--d-red)"></span>Terrain &amp; hillshade</h3>
+          <p>Register a DEM and get hillshade — and optional 3D terrain on the MapLibre flavour. Ctrl-drag to tilt.</p>
+        </div>
+        <div class="cell">
+          <h3><span class="d" style="background:var(--d-pink)"></span>Live streams</h3>
+          <p>The <code>geomqtt</code> layer subscribes to an MQTT broker and pushes incoming features onto the map in real time.</p>
+        </div>
+        <div class="cell">
+          <h3><span class="d" style="background:var(--accent)"></span>Static pages</h3>
+          <p>Ship About / Sources / Methodology prose alongside the map with a <code>geocontext-static.json</code> registry.</p>
+        </div>
+        <div class="cell">
+          <h3><span class="d" style="background:var(--faint)"></span>CDN-delivered</h3>
+          <p>Assets resolve through jsDelivr against your repo — short relative paths, cross-repo composition, no hosting to run.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN / CITE -->
+  <section id="open">
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow">Open &amp; cited</span>
+        <h2>Built for the public record.</h2>
+        <p>Apache-2.0, descended from a decade of archaeology and neocartography work. Every map carries its repo, its branch, and its attribution — so a reader can always ask “where did this come from?”</p>
+      </div>
+
+      <div class="cite">
+        <div>
+          <blockquote class="quote">
+            Marsicano, L. &amp; Montanari, M. (2018). <em>GeoContext and ChContext: Geographic Information in Cultural Heritage.</em>
+            International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences, XLII-4/W8, 129–132.
+            <br><cite><a href="https://doi.org/10.5194/isprs-archives-XLII-4-W8-129-2018">doi.org/10.5194/isprs-archives-XLII-4-W8-129-2018</a></cite>
+          </blockquote>
+        </div>
+        <ul class="meta-list">
+          <li><span class="ico">§</span><span><b>An open format.</b> The spec lives in <a href="https://github.com/ohm-geocontext/geocontext-front/blob/HEAD/FORMAT.md">FORMAT.md</a> — every field documented, no proprietary extensions.</span></li>
+          <li><span class="ico">⚖</span><span><b>Apache-2.0.</b> Use it, embed it, fork it. Libraries publish to GitHub Packages under <code class="mono">@openhistorymap/*</code>.</span></li>
+          <li><span class="ico">@</span><span><b>Cite this repository.</b> Each tool ships a <code class="mono">CITATION.cff</code> so GitHub renders a “Cite” button.</span></li>
+          <li><span class="ico">⌖</span><span><b>Made in Bologna</b> by <a href="https://www.openhistorymap.org">OpenHistoryMap</a> — archaeologists and developers, since 2015.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><img src="/assets/logo.png" alt="" width="30" height="30">GeoContext</a>
+        <p>A free, declarative way to publish a map of any public dataset. By OpenHistoryMap.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Project</h4>
+        <ul>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#toolkit">Toolkit</a></li>
+          <li><a href="#renders">What it renders</a></li>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-front/blob/HEAD/FORMAT.md">Format spec</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Repositories</h4>
+        <ul>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-front">geocontext-front</a></li>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-app">geocontext-app</a></li>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-qgis">geocontext-qgis</a></li>
+          <li><a href="https://github.com/ohm-geocontext">All on GitHub</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>OpenHistoryMap</h4>
+        <ul>
+          <li><a href="https://www.openhistorymap.org">openhistorymap.org</a></li>
+          <li><a href="https://www.openhistorymap.org/geocontext-front/">Live viewer</a></li>
+          <li><a href="https://doi.org/10.5194/isprs-archives-XLII-4-W8-129-2018">Foundational paper</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2018–2026 OpenHistoryMap · Apache-2.0</span>
+      <span>geocontext.info · The map is the content.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
