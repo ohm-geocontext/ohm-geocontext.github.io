@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GeoContext — publish a map of any public dataset</title>
-<meta name="description" content="GeoContext is a free, declarative way to publish a map of any public dataset. Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account. Apache-2.0, by OpenHistoryMap.">
+<meta name="description" content="GeoContext is a free, declarative way to publish a map of any public dataset. Drop a geocontext.json in a public GitHub repo and open it as an interactive map — or add a story.json and read it as a scrolling article that moves the map. No fork, no build, no account. Apache-2.0, by OpenHistoryMap.">
 <link rel="canonical" href="https://geocontext.info/">
 <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)">
@@ -12,12 +12,12 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="GeoContext">
 <meta property="og:title" content="GeoContext — publish a map of any public dataset">
-<meta property="og:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account.">
+<meta property="og:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map — or add a story.json and read it as a longform article that moves the map.">
 <meta property="og:url" content="https://geocontext.info/">
 <meta property="og:image" content="https://geocontext.info/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="GeoContext — publish a map of any public dataset">
-<meta name="twitter:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map. No fork, no build, no account.">
+<meta name="twitter:description" content="Drop a geocontext.json in a public GitHub repo and open it as an interactive map — or add a story.json and read it as a longform article that moves the map.">
 <meta name="twitter:image" content="https://geocontext.info/assets/og.png">
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -148,7 +148,7 @@
   .urlcard .arrow{color:var(--faint);font-family:var(--mono)}
 
   /* ---- toolkit ---- */
-  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+  .tools{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
   @media (max-width:880px){ .tools{grid-template-columns:1fr} }
   .tool{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
     border-radius:14px;padding:clamp(22px,3vw,30px);transition:border-color .18s,transform .18s,box-shadow .18s}
@@ -221,6 +221,7 @@
       <a href="#how">How it works</a>
       <a href="#toolkit">Toolkit</a>
       <a href="#renders">What it renders</a>
+      <a href="#stories">Stories</a>
       <a href="#open">Open &amp; cited</a>
       <a class="cta" href="https://github.com/ohm-geocontext">GitHub</a>
     </nav>
@@ -324,9 +325,9 @@
   <section id="toolkit">
     <div class="container">
       <div class="sec-head">
-        <span class="eyebrow">One engine, three on-ramps</span>
-        <h2>Write it, draw it, or export it.</h2>
-        <p>The format is plain JSON, so you can author it however suits you — by hand, from a desktop editor with a live preview, or straight out of QGIS. One engine renders them all.</p>
+        <span class="eyebrow">Two engines, three on-ramps</span>
+        <h2>Write it, draw it, or export it — then tell it.</h2>
+        <p>The format is plain JSON, so you can author it however suits you — by hand, from a desktop editor with a live preview, or straight out of QGIS. Then read the result as a map, or as a scrolling article that moves it.</p>
       </div>
 
       <div class="tools">
@@ -336,6 +337,13 @@
           <span class="repo">ohm-geocontext/geocontext-front</span>
           <p>The Angular + MapLibre/Leaflet renderer that reads any repo and draws the map at <code>/&lt;user&gt;/&lt;repo&gt;/map</code>. Plugin-driven: every basemap and data format is a small library you can extend.</p>
           <span class="go">View the engine</span>
+        </a>
+        <a class="tool" href="https://github.com/ohm-geocontext/geocontext-storybook">
+          <span class="kind">The narrator · web</span>
+          <h3>GeoContext Storybook</h3>
+          <span class="repo">ohm-geocontext/geocontext-storybook</span>
+          <p>Add a <code>story.json</code> next to your map and it becomes a longform article: prose scrolls in a column while the camera follows it, layers come and go, and the basemap crossfades underneath.</p>
+          <span class="go">Tell a story</span>
         </a>
         <a class="tool" href="https://github.com/ohm-geocontext/geocontext-app">
           <span class="kind">Author · desktop</span>
@@ -394,6 +402,54 @@
     </div>
   </section>
 
+  <!-- STORIES -->
+  <section id="stories">
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow">Longform · new</span>
+        <h2>And when the map has an argument to make.</h2>
+        <p>A legend explains what the colours mean. It does not explain why the northern soundings matter, or what changed between 1976 and now. GeoContext Storybook reads a second small file next to your map and renders it as a scrolling article — the prose moves the camera, layers come and go, and the basemap crossfades underneath.</p>
+      </div>
+
+      <div class="codewrap">
+        <div class="plate">
+          <div class="cap"><span class="dot" style="background:var(--d-red)"></span><span class="dot" style="background:#e9b84e"></span><span class="dot" style="background:var(--d-green)"></span>&nbsp;story.json</div>
+<pre><span class="c">// next to the geocontext.json it narrates</span>
+{
+  <span class="k">"title"</span>: <span class="s">"A story on a map"</span>,
+  <span class="k">"extends"</span>: <span class="s">"geocontext.json"</span>,
+  <span class="k">"blocks"</span>: [
+    { <span class="k">"title"</span>: <span class="s">"Down to one feature"</span>,
+      <span class="k">"text"</span>: <span class="s">"The data decides where to look."</span>,
+      <span class="k">"camera"</span>: { <span class="k">"focus"</span>: { <span class="k">"datasource"</span>: <span class="s">"sites"</span>,
+        <span class="k">"where"</span>: { <span class="k">"code"</span>: <span class="s">"D-04"</span> } } },
+      <span class="k">"layers"</span>: { <span class="k">"only"</span>: [<span class="s">"basin"</span>, <span class="s">"sites"</span>] } },
+
+    { <span class="k">"type"</span>: <span class="s">"tour"</span>, <span class="k">"datasource"</span>: <span class="s">"sites"</span>,
+      <span class="k">"template"</span>: { <span class="k">"title"</span>: <span class="s">"{name}"</span>,
+        <span class="k">"text"</span>: <span class="s">"{note}"</span> } }
+  ]
+}</pre>
+        </div>
+        <div class="plate urlcard">
+          <div>
+            <div class="label">What each block can do</div>
+            <p style="margin:.4rem 0 0;color:var(--muted);font-size:.95rem">Move the camera — to coordinates, to a bounding box, or to whichever features match a property. Show, hide, dim or filter layers. Swap the basemap. Carry its own images, video and captions, or a full-bleed backdrop that hides the map entirely.</p>
+          </div>
+          <div class="arrow">↓</div>
+          <div>
+            <div class="label">And that last block</div>
+            <p style="margin:.4rem 0 0;color:var(--muted);font-size:.95rem">A <code>tour</code> writes itself from the data: one section per feature, framed on its own geometry, with <code>{name}</code> and <code>{note}</code> filled in from its properties. Add a row to the GeoJSON and the story grows a section.</p>
+          </div>
+          <div style="margin-top:.4rem;display:flex;gap:.6rem;flex-wrap:wrap">
+            <a class="btn primary" style="font-size:.9rem;padding:.6em 1em" href="https://geocontext.info/geocontext-storybook/?story=examples/demo/story.json">Read the demo story</a>
+            <a class="btn ghost" style="font-size:.9rem;padding:.6em 1em" href="https://github.com/ohm-geocontext/geocontext-storybook/blob/HEAD/STORY_FORMAT.md">Story spec</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- OPEN / CITE -->
   <section id="open">
     <div class="container">
@@ -435,7 +491,9 @@
           <li><a href="#how">How it works</a></li>
           <li><a href="#toolkit">Toolkit</a></li>
           <li><a href="#renders">What it renders</a></li>
+          <li><a href="#stories">Stories</a></li>
           <li><a href="https://github.com/ohm-geocontext/geocontext-front/blob/HEAD/FORMAT.md">Format spec</a></li>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-storybook/blob/HEAD/STORY_FORMAT.md">Story spec</a></li>
         </ul>
       </div>
       <div class="foot-col">
@@ -444,6 +502,7 @@
           <li><a href="https://github.com/ohm-geocontext/geocontext-front">geocontext-front</a></li>
           <li><a href="https://github.com/ohm-geocontext/geocontext-app">geocontext-app</a></li>
           <li><a href="https://github.com/ohm-geocontext/geocontext-qgis">geocontext-qgis</a></li>
+          <li><a href="https://github.com/ohm-geocontext/geocontext-storybook">geocontext-storybook</a></li>
           <li><a href="https://github.com/ohm-geocontext">All on GitHub</a></li>
         </ul>
       </div>
