@@ -342,7 +342,7 @@
           <span class="kind">The narrator · web</span>
           <h3>GeoContext Storybook</h3>
           <span class="repo">ohm-geocontext/geocontext-storybook</span>
-          <p>Add a <code>story.json</code> next to your map and it becomes a longform article: prose scrolls in a column while the camera follows it, layers come and go, and the basemap crossfades underneath.</p>
+          <p>Add a <code>story.json</code> next to your map and it becomes a longform article: prose scrolls in a column while the camera follows it, layers come and go, and the basemap crossfades underneath. A <code>stories.json</code> carries several readings of the one map.</p>
           <span class="go">Tell a story</span>
         </a>
         <a class="tool" href="https://github.com/ohm-geocontext/geocontext-app">
@@ -408,7 +408,7 @@
       <div class="sec-head">
         <span class="eyebrow">Longform · new</span>
         <h2>And when the map has an argument to make.</h2>
-        <p>A legend explains what the colours mean. It does not explain why the northern soundings matter, or what changed between 1976 and now. GeoContext Storybook reads a second small file next to your map and renders it as a scrolling article — the prose moves the camera, layers come and go, and the basemap crossfades underneath.</p>
+        <p>A legend explains what the colours mean. It does not explain why the northern soundings matter, or what changed between 1976 and now. GeoContext Storybook reads a second small file next to your map and renders it as a scrolling article — the prose moves the camera, layers come and go, and the basemap crossfades underneath. One map can carry as many readings as it has arguments.</p>
       </div>
 
       <div class="codewrap">
@@ -444,6 +444,44 @@
           <div style="margin-top:.4rem;display:flex;gap:.6rem;flex-wrap:wrap">
             <a class="btn primary" style="font-size:.9rem;padding:.6em 1em" href="https://geocontext.info/geocontext-storybook/?story=examples/demo/story.json">Read the demo story</a>
             <a class="btn ghost" style="font-size:.9rem;padding:.6em 1em" href="https://github.com/ohm-geocontext/geocontext-storybook/blob/HEAD/STORY_FORMAT.md">Story spec</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="codewrap" style="margin-top:clamp(20px,3vw,34px)">
+        <div class="plate">
+          <div class="cap"><span class="dot" style="background:var(--d-red)"></span><span class="dot" style="background:#e9b84e"></span><span class="dot" style="background:var(--d-green)"></span>&nbsp;stories.json</div>
+<pre><span class="c">// one map, several readings of it</span>
+{
+  <span class="k">"kind"</span>: <span class="s">"geocontext-stories"</span>,
+  <span class="k">"geocontext"</span>: <span class="s">"geocontext.json"</span>,
+  <span class="k">"stories"</span>: [
+    { <span class="k">"id"</span>: <span class="s">"excavation"</span>,
+      <span class="k">"path"</span>: <span class="s">"stories/excavation.json"</span>,
+      <span class="k">"title"</span>: <span class="s">"The excavation"</span> },
+
+    { <span class="k">"id"</span>: <span class="s">"drainage"</span>,
+      <span class="k">"path"</span>: <span class="s">"stories/drainage.json"</span>,
+      <span class="k">"title"</span>: <span class="s">"Draining the valley"</span> },
+
+    { <span class="k">"id"</span>: <span class="s">"next"</span>,
+      <span class="k">"path"</span>: <span class="s">"stories/next.json"</span>,
+      <span class="k">"draft"</span>: <span class="n">true</span> }
+  ]
+}</pre>
+        </div>
+        <div class="plate urlcard">
+          <div>
+            <div class="label">One map, many readings</div>
+            <p style="margin:.4rem 0 0;color:var(--muted);font-size:.95rem">The excavation and the drainage. The 1976 survey and the 2019 one. Each narration is its own file over the same <code>geocontext.json</code>; the index lists them, and every story carries a switcher to its siblings. A <code>draft</code> stays in the repo and out of the reader's way.</p>
+          </div>
+          <div class="arrow">↓</div>
+          <div>
+            <div class="label">And back again</div>
+            <p style="margin:.4rem 0 0;color:var(--muted);font-size:.95rem">A story links to the map it argues about; the map links to the stories written about it. Neither app is told about the other's content — both simply read the repository.</p>
+          </div>
+          <div style="margin-top:.4rem;display:flex;gap:.6rem;flex-wrap:wrap">
+            <a class="btn ghost" style="font-size:.9rem;padding:.6em 1em" href="https://geocontext.info/geocontext-storybook/?story=examples/demo/stories.json">Browse the demo index</a>
           </div>
         </div>
       </div>
